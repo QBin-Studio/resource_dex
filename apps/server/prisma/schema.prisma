@@ -1,0 +1,57 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "./client"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Platforms {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  domainBases DomainBases[]
+  Files       File[]
+
+  @@index([name])
+  @@map("platforms")
+}
+
+model DomainBases {
+  id         Int       @id @default(autoincrement())
+  url        String    @unique
+  platformId String
+  match      String    @default("base_match")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  platform   Platforms @relation(fields: [platformId], references: [id])
+
+  @@map("domain_bases")
+}
+
+model File {
+  id          String  @id @default(cuid())
+  link        String  @unique
+  location    String
+  version     String  @default("v1.0.0")
+  files       String?
+  name        String?
+  description String?
+  thumbnail   String?
+  meta_url    String?
+
+  //platform
+  platform   Platforms? @relation(fields: [platformId], references: [id])
+  platformId String?
+
+  //timestamp
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([link])
+  @@map("files")
+}

@@ -1,0 +1,28 @@
+{
+  "name": "web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "t:dev": "vite --port=7930",
+    "dev": "vite --port=7930",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
+    "gen:icon": "icosea -f=./src/assets/icosea/icons.toml"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@tailwindcss/vite": "^4.1.3",
+    "@tsconfig/svelte": "^5.0.4",
+    "daisyui": "^5.0.12",
+    "svelte": "^5.20.2",
+    "svelte-check": "^4.1.4",
+    "tailwindcss": "^4.1.3",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "@mateothegreat/svelte5-router": "^2.14.1"
+  }
+}
