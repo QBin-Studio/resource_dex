@@ -23,6 +23,11 @@
         "^lint"
       ]
     },
+    "t:package": {
+      "dependsOn": [
+        "^t:package"
+      ]
+    },
     "check-types": {
       "dependsOn": [
         "^check-types"

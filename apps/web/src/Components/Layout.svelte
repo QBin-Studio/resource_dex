@@ -15,10 +15,12 @@
 
 <CreateByLinkModal bind:this={createByLinkModal} />
 
-<div class="bg-base-300 py-3 border-gray-300 border-b text-base-content">
+<div class="bg-base-300 py-3 fixed w-full z-[199] border-gray-300 border-b text-base-content">
   <div class="container mx-auto flex">
-    <div class="">
+    <div class="flex items-center gap-4">
       <h5 class="font-medium"><a href="/" use:route class="">Resource Dex</a></h5>
+
+      <button class="btn" onclick={() => createByLinkModal.show()}> Create By url</button>
     </div>
 
     <div class="flex-1">
@@ -31,8 +33,6 @@
 
 <!-- Shortcut button  -->
 
-<div class="fixed right-5 bottom-5">
-  <button class="btn" onclick={() => createByLinkModal.show()}> Create By url</button>
-</div>
+<div class="fixed right-5 bottom-5"></div>
 
 {@render children()}

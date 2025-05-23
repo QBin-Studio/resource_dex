@@ -17,8 +17,10 @@
     "moduleDetection": "force",
     "paths": {
       "~/*":["./src/*"],
-      "~api/*":["./src/api/*"]
+      "~api/*":["./src/api/*"],
+      "~prisma-client/*": ["../server/prisma/client/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"]
+  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "../server/prisma/client"],
+
 }

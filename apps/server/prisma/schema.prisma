@@ -21,6 +21,17 @@ model Platforms {
   @@map("platforms")
 }
 
+model FilesLocation {
+  id       String  @id @default(cuid())
+  location String? @unique
+  name     String?
+  File     File?   @relation(fields: [fileId], references: [id])
+  fileId   String?
+
+  @@index([location, id])
+  @@map("files_location")
+}
+
 model DomainBases {
   id         Int       @id @default(autoincrement())
   url        String    @unique
@@ -34,11 +45,11 @@ model DomainBases {
 }
 
 model File {
-  id          String  @id @default(cuid())
-  link        String  @unique
+  id          String          @id @default(cuid())
+  link        String          @unique
   location    String
-  version     String  @default("v1.0.0")
-  files       String?
+  version     String          @default("v1.0.0")
+  files       FilesLocation[]
   name        String?
   description String?
   thumbnail   String?
@@ -52,6 +63,6 @@ model File {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([link])
+  @@index([link, id])
   @@map("files")
 }

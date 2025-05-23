@@ -1,6 +1,4 @@
 <script lang="ts">
-  import svelteLogo from './assets/svelte.svg';
-  import viteLogo from '/vite.svg';
   import Counter from './lib/Counter.svelte';
   import { Router, type Route, type RouteConfig } from '@mateothegreat/svelte5-router';
   import UploadPage from './pages/PageUpload.svelte';

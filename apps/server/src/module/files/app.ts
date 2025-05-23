@@ -3,16 +3,48 @@ import { Hono } from "hono";
 import { validator } from "hono/validator";
 import { z } from "zod";
 import dbClient from "~/db.js";
-import { createFileByLink, createLocationFolderFromURL } from "./services.js";
+import {
+    createFileByLink,
+    createLocationFolderFromURL,
+    openInFileManager,
+} from "./services.js";
 import { getMetadataFromUrl } from "../link/services.js";
+import { OkResponse } from "~/common/response.js";
 
 export const fileApp = new Hono();
 
-fileApp.get("/", async (ctx) => {
-    const files = await dbClient.file;
+fileApp.get(
+    "/",
+    zValidator(
+        "query",
+        z.object({
+            page: z.coerce.number().default(1),
+            limit: z.coerce.number().default(50),
+            platform: z.string().optional(),
+        }),
+    ),
+    async (ctx) => {
+        const query = ctx.req.valid("query");
 
-    return ctx.json(files);
-});
+        const files = await dbClient.file.findMany({
+            take: query.limit,
+            skip: query.page === 1 ? 0 : query.page * query.limit,
+            include: {
+                platform: {
+                    where: {
+                        name: query.platform,
+                    },
+
+                    include: {
+                        domainBases: true,
+                    },
+                },
+            },
+        });
+
+        return ctx.json(files);
+    },
+);
 
 fileApp.post("/", (ctx) => {
     /*
@@ -92,6 +124,10 @@ fileApp.get("/domain-bases", async (ctx) => {
 
 fileApp.post(
     "/create-by-link",
+    /*     async (c, next) => {
+        console.log(await c.req.json());
+        next();
+    }, */
     zValidator(
         "json",
         z.object({
@@ -120,6 +156,24 @@ fileApp.post(
             title: body.title || "N/A",
             url: body.url,
         });
-        return c.json(createdfile);
+        return OkResponse(createdfile).setMessage(
+            "successfully created new resource",
+        ).make();
+    },
+);
+
+fileApp.get(
+    "/open-in-file-manager",
+    zValidator(
+        "query",
+        z.object({
+            location: z.string(),
+        }),
+    ),
+    async (ctx) => {
+        const query = ctx.req.valid("query");
+        const result = await openInFileManager(query.location);
+
+        return OkResponse(result).make();
     },
 );

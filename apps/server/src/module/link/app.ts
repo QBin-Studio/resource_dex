@@ -20,7 +20,6 @@ linkHono.get(
         if (!link) return c.text("link query parameter is required");
 
         const meta = await getMetadataFromUrl(link);
-        console.log(meta);
 
         return c.json(meta);
     },
