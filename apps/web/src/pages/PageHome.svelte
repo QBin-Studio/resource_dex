@@ -33,6 +33,9 @@
             <button onclick={() => copy_text(data.location)} class="btn btn-xs text-base"
               >{@html icon('copy_file')}</button
             >
+            <button onclick={() => copy_text(data.location)} class="btn btn-xs text-base"
+              >Delete</button
+            >
           </div>
         </div>
       {/each}

@@ -89,7 +89,7 @@ export async function createLocationFolderFromURL(_url: string): Promise<{
     url.hostname + (url.pathname.startsWith('/') ? url.pathname : '/' + url.pathname);
 
   // Location with base url
-  const location_str = path.resolve(base_URL, raw_path);
+  const location_str = path.resolve(path.join(base_URL, raw_path));
 
   const folder_path = await fs
     .mkdir(location_str, {
@@ -114,10 +114,12 @@ export async function createLocationFolderFromURL(_url: string): Promise<{
 export async function openInFileManager(location: string) {
   return new Promise((resolve, reject) => {
     let command_env = process.env.FILE_OPEN_COMMAND;
+    let resource_base = RESOURCE_BASE();
 
     if (!command_env) return reject('FILE_OPEN_COMMAND is not defined in .env');
+    if (!resource_base) return reject('RESOURCE_BASE is not found in .env');
 
-    let command = command_env + ' ' + location;
+    let command = command_env + ' ' + path.resolve(path.join(resource_base, location));
 
     const ch = spawn(command, {
       detached: true,

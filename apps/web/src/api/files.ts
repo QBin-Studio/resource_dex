@@ -1,5 +1,4 @@
 import { API } from '~/lib/api_base';
-import type { DomainBases, File, Platforms } from '~prisma-client/index';
 import type { SResponse } from './types';
 
 export const getAllFiles = async (limit = 50, page = 1) => {

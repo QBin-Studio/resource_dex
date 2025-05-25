@@ -6,6 +6,7 @@ import dbClient from '~/db.js';
 import { createFileByLink, createLocationFolderFromURL, openInFileManager } from './services.js';
 import { getMetadataFromUrl } from '../link/services.js';
 import { OkResponse } from '~/common/response.js';
+import path from 'node:path';
 
 export const fileApp = new Hono();
 
@@ -25,6 +26,9 @@ fileApp.get(
     const files = await dbClient.file.findMany({
       take: query.limit,
       skip: query.page === 1 ? 0 : query.page * query.limit,
+      orderBy: {
+        createdAt: 'desc'
+      },
       include: {
         platform: {
           where: {
@@ -43,16 +47,6 @@ fileApp.get(
 );
 
 fileApp.post('/', (ctx) => {
-  /*
-    expected body
-
-    {
-     link: "url" ,
-     thumbnail:"url",
-     file:"url"
-    }
-    */
-
   return ctx.text('hello');
 });
 
@@ -146,7 +140,7 @@ fileApp.post(
     const createdFile = await createFileByLink({
       description: body.description || 'N/A',
       img: body.img || 'N/A',
-      location: folderLoc.path,
+      location: path.posix.normalize(folderLoc.path),
       title: body.title || 'N/A',
       url: body.url
     });
