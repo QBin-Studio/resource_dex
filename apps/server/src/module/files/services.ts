@@ -5,6 +5,10 @@ import { exec, spawn } from 'node:child_process';
 import { env } from 'hono/adapter';
 import { RESOURCE_BASE } from '~/config/env.js';
 import path from 'node:path';
+import * as https from 'node:https';
+import * as http from 'node:http';
+import { createWriteStream } from 'node:fs';
+import { getExtFromContentType } from '~/common/detector.js';
 
 export async function createFileByLink(params: {
   img: string;
@@ -111,6 +115,72 @@ export async function createLocationFolderFromURL(_url: string): Promise<{
   };
 }
 
+// Write Metadata to Folder;
+// Keep a local copy of thumbnail.
+export async function putMetadataInDirectory(
+  location: string,
+  data: { thumbnail: string | 'NA' } & Record<string, unknown>
+) {
+  const resource_base = RESOURCE_BASE();
+  if (!resource_base) {
+    throw Error('RESOURCE_BASE not exist in env');
+  }
+
+  // create text file.
+  await fs.writeFile(path.resolve(resource_base, location, './meta.json'), JSON.stringify(data));
+
+  return true;
+}
+
+/**
+ * Download and Put a local Copy of Thumbnail in Directory.
+ * if thumbnail not found it will return '/data/na-thumbnail.png'
+ * @param location
+ * @param data
+ * @returns
+ */
+export async function putThumbnailInDirectory(
+  location: string,
+  data: { thumbnail: string | 'NA' } & Record<string, unknown>
+): Promise<{ thumbnail_link: string }> {
+  return new Promise((resolve, reject) => {
+    const resource_base = RESOURCE_BASE();
+    if (!resource_base) {
+      throw Error('RESOURCE_BASE not exist in env');
+    }
+
+    if (data.thumbnail === 'NA') return resolve({ thumbnail_link: '/data/na-thumbnail.png' });
+    const protocol = data.thumbnail.startsWith('https') ? https : http;
+
+    protocol
+      .get(data.thumbnail, (response) => {
+        const contentType = response.headers['content-type'];
+        if (!contentType) throw new Error('content-type is not exist in url headers;');
+        const extension = getExtFromContentType(contentType);
+
+        const thumbnailFilePath = path.resolve(
+          resource_base,
+          location,
+          './thumbnail.' + (extension || 'png')
+        );
+        const thumbnailFile = createWriteStream(thumbnailFilePath);
+
+        response.pipe(thumbnailFile);
+
+        thumbnailFile.on('finish', () =>
+          resolve({
+            thumbnail_link: path.posix.resolve(location, './thumbnail' + (extension || 'png'))
+          })
+        );
+        thumbnailFile.on('error', reject);
+      })
+      .on('error', reject);
+  });
+}
+
+/**
+ * Open Location in file Manager
+ */
 export async function openInFileManager(location: string) {
   return new Promise((resolve, reject) => {
     let command_env = process.env.FILE_OPEN_COMMAND;

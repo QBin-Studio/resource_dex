@@ -5,12 +5,12 @@ import { PrismaClient } from '@prisma/client';
 import { logger } from 'hono/logger';
 import { linkHono } from './module/link/app.js';
 import { cors } from 'hono/cors';
-import { loadResounceDexConfig } from '~/config/resounceDex_config.js';
+import { loadResounceDexConfig as loadResourceDexConfig } from '~/config/resounceDex_config.js';
 import { ErrResponse } from './common/response.js';
 import 'dotenv/config';
 
 //Loading ResourceDex Config;
-loadResounceDexConfig();
+loadResourceDexConfig();
 
 const app = new Hono();
 

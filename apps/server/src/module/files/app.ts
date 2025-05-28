@@ -3,7 +3,13 @@ import { Hono } from 'hono';
 import { validator } from 'hono/validator';
 import { z } from 'zod';
 import dbClient from '~/db.js';
-import { createFileByLink, createLocationFolderFromURL, openInFileManager } from './services.js';
+import {
+  createFileByLink,
+  createLocationFolderFromURL,
+  openInFileManager,
+  putMetadataInDirectory,
+  putThumbnailInDirectory
+} from './services.js';
 import { getMetadataFromUrl } from '../link/services.js';
 import { OkResponse } from '~/common/response.js';
 import path from 'node:path';
@@ -112,10 +118,6 @@ fileApp.get('/domain-bases', async (ctx) => {
 
 fileApp.post(
   '/create-by-link',
-  /*     async (c, next) => {
-        console.log(await c.req.json());
-        next();
-    }, */
   zValidator(
     'json',
     z.object({
@@ -136,10 +138,23 @@ fileApp.post(
     }
 
     const folderLoc = await createLocationFolderFromURL(body.url);
+    await putMetadataInDirectory(folderLoc.path, {
+      thumbnail: body.img || 'N/A',
+      href: body.url,
+      title: body.title,
+      description: body.description
+    });
+
+    const { thumbnail_link } = await putThumbnailInDirectory(folderLoc.path, {
+      thumbnail: body.img || 'N/A',
+      href: body.url,
+      title: body.title,
+      description: body.description
+    });
 
     const createdFile = await createFileByLink({
       description: body.description || 'N/A',
-      img: body.img || 'N/A',
+      img: path.posix.normalize(thumbnail_link) || 'N/A',
       location: path.posix.normalize(folderLoc.path),
       title: body.title || 'N/A',
       url: body.url
