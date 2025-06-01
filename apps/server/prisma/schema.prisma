@@ -54,6 +54,7 @@ model File {
   description String?
   thumbnail   String?
   meta_url    String?
+  raw_url     String?
 
   //platform
   platform   Platforms? @relation(fields: [platformId], references: [id])
@@ -63,6 +64,6 @@ model File {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([link, id])
+  @@index([link, id, name])
   @@map("files")
 }

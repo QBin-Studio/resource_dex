@@ -1,14 +1,13 @@
 import dbClient from '~/db.js';
 import fs from 'node:fs/promises';
-import { getResourceDexConfig } from '~/config/resounceDex_config.js';
-import { exec, spawn } from 'node:child_process';
-import { env } from 'hono/adapter';
+import { spawn } from 'node:child_process';
 import { RESOURCE_BASE } from '~/config/env.js';
 import path from 'node:path';
 import * as https from 'node:https';
 import * as http from 'node:http';
 import { createWriteStream } from 'node:fs';
 import { getExtFromContentType } from '~/common/detector.js';
+import { url_normalize } from '~/common/url.js';
 
 export async function createFileByLink(params: {
   img: string;
@@ -29,23 +28,15 @@ export async function createFileByLink(params: {
     }
   };
 
-  const ifFound = await dbClient.file.findFirst({
-    where: {
-      link: {
-        equals: params.url
-      }
-    }
-  });
-  if (ifFound) throw new Error('an entry already exist with this link');
-
   const created = await dbClient.file.create({
     data: {
-      link: params.url,
+      link: url_normalize(url),
       description: params.description,
       name: params.title,
       location: params.location,
       thumbnail: params.img,
       meta_url: pureUrl,
+      raw_url: url.toString(),
       platform: {
         connectOrCreate: {
           where: {
@@ -169,7 +160,7 @@ export async function putThumbnailInDirectory(
 
         thumbnailFile.on('finish', () =>
           resolve({
-            thumbnail_link: path.posix.resolve(location, './thumbnail' + (extension || 'png'))
+            thumbnail_link: path.posix.join(location, './thumbnail' + (extension || 'png'))
           })
         );
         thumbnailFile.on('error', reject);

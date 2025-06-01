@@ -13,6 +13,7 @@ import {
 import { getMetadataFromUrl } from '../link/services.js';
 import { OkResponse } from '~/common/response.js';
 import path from 'node:path';
+import { url_normalize } from '~/common/url.js';
 
 export const fileApp = new Hono();
 
@@ -116,6 +117,9 @@ fileApp.get('/domain-bases', async (ctx) => {
   return new Response(new TextEncoder().encode(JSON.stringify(allDomainBases)));
 });
 
+/**
+ *  Create File by Link
+ */
 fileApp.post(
   '/create-by-link',
   zValidator(
@@ -129,6 +133,17 @@ fileApp.post(
   ),
   async (c) => {
     let body = c.req.valid('json');
+
+    const url = new URL(body.url);
+
+    const ifFound = await dbClient.file.findFirst({
+      where: {
+        link: {
+          equals: url_normalize(url)
+        }
+      }
+    });
+    if (ifFound) throw new Error('an entry already exist with this link');
 
     if (!body.description || !body.img || !body.title) {
       const m = await getMetadataFromUrl(body.url);
@@ -145,7 +160,7 @@ fileApp.post(
       description: body.description
     });
 
-    const { thumbnail_link } = await putThumbnailInDirectory(folderLoc.path, {
+    await putThumbnailInDirectory(folderLoc.path, {
       thumbnail: body.img || 'N/A',
       href: body.url,
       title: body.title,
@@ -154,7 +169,7 @@ fileApp.post(
 
     const createdFile = await createFileByLink({
       description: body.description || 'N/A',
-      img: path.posix.normalize(thumbnail_link) || 'N/A',
+      img: body.img || 'N/A',
       location: path.posix.normalize(folderLoc.path),
       title: body.title || 'N/A',
       url: body.url
