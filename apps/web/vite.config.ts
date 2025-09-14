@@ -1,24 +1,8 @@
-import { defineConfig } from "vite";
-import { svelte } from "@sveltejs/vite-plugin-svelte";
-import tailwindcss from "@tailwindcss/vite";
-import path from "node:path";
+import devtoolsJson from 'vite-plugin-devtools-json';
+import tailwindcss from '@tailwindcss/vite';
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
-  plugins: [tailwindcss(), svelte()],
-  resolve: {
-    alias: [
-      {
-        find: "~api/",
-        replacement: path.resolve(__dirname, "src/api") + "/",
-      },
-      {
-        find: "~/",
-        replacement: path.resolve(__dirname, "src") + "/",
-      },
-      {
-        find: "~prisma-client/",
-        replacement: path.resolve(__dirname, "../server/prisma/client") + "/",
-      },
-    ],
-  },
+	plugins: [tailwindcss(), sveltekit(), devtoolsJson()]
 });

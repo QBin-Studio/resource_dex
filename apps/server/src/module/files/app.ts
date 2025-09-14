@@ -8,10 +8,11 @@ import {
   createLocationFolderFromURL,
   openInFileManager,
   putMetadataInDirectory,
-  putThumbnailInDirectory
+  putThumbnailInDirectory,
+  searchFilesByString
 } from './services.js';
 import { getMetadataFromUrl } from '../link/services.js';
-import { OkResponse } from '~/common/response.js';
+import { ErrResponse, OkResponse } from '~/common/response.js';
 import path from 'node:path';
 import { url_normalize } from '~/common/url.js';
 
@@ -191,5 +192,21 @@ fileApp.get(
     const result = await openInFileManager(query.location);
 
     return OkResponse(result).make();
+  }
+);
+
+// Search by name
+fileApp.get(
+  '/search',
+  zValidator('query', z.object({ q: z.string().min(1, 'q parameter cannot be empty') })),
+  async (ctx) => {
+    const q = ctx.req.valid('query').q;
+
+    const data = await searchFilesByString(q);
+
+    if (data) {
+      return OkResponse(data).make();
+    }
+    return ErrResponse(null, '0 result for ' + q).make();
   }
 );

@@ -1,6 +1,6 @@
 import dbClient from '~/db.js';
 import fs from 'node:fs/promises';
-import { spawn } from 'node:child_process';
+import { exec, spawn } from 'node:child_process';
 import { RESOURCE_BASE } from '~/config/env.js';
 import path from 'node:path';
 import * as https from 'node:https';
@@ -8,6 +8,7 @@ import * as http from 'node:http';
 import { createWriteStream } from 'node:fs';
 import { getExtFromContentType } from '~/common/detector.js';
 import { url_normalize } from '~/common/url.js';
+import { stdout } from 'node:process';
 
 export async function createFileByLink(params: {
   img: string;
@@ -182,22 +183,24 @@ export async function openInFileManager(location: string) {
 
     let command = command_env + ' ' + path.resolve(path.join(resource_base, location));
 
-    const ch = spawn(command, {
-      detached: true,
-      shell: true,
-      env: process.env
+    const ch = exec(command, function (err, so, se) {
+      console.log(err);
     });
+  });
+}
 
-    ch.on('error', (err) => {
-      reject(err);
-    });
-
-    ch.on('close', (code) => {
-      if (code === 0) {
-        resolve(true);
-      } else {
-        reject(new Error(`Process exited with code ${code}`));
+/**
+ * Search File
+ */
+export async function searchFilesByString(string: string) {
+  return dbClient.file.findMany({
+    where: {
+      name: {
+        contains: string
       }
-    });
+    },
+    include: {
+      platform: true
+    }
   });
 }

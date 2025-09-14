@@ -1,7 +1,6 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { fileApp } from './module/files/app.js';
-import { PrismaClient } from '@prisma/client';
 import { logger } from 'hono/logger';
 import { linkHono } from './module/link/app.js';
 import { cors } from 'hono/cors';

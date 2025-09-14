@@ -2,17 +2,17 @@
 @plugin "daisyui";
 
 @layer base {
-  * {
-    border-color: var(--color-gray-200);
-  }
+	* {
+		border-color: var(--color-gray-200);
+	}
 
-  .icosea_icon {
-    display: inline-block;
-  }
+	.icosea_icon {
+		display: inline-block;
+	}
 }
 
 @theme {
-  --font-mono:
-    'Jetbrains mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-    'Courier New', monospace;
+	--font-mono:
+		'Jetbrains mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+		'Courier New', monospace;
 }

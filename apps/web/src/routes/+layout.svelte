@@ -1,7 +1,8 @@
 <script lang="ts">
+	import '../app.css';
 	import type { Snippet } from 'svelte';
 
-	import CreateByLinkModal from './modals/CreateByLinkModal.svelte';
+	import CreateByLinkModal from '../Components/modals/CreateByLinkModal.svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
 	import { goto } from '$app/navigation';
@@ -19,7 +20,7 @@
 		const value = e.currentTarget.value;
 
 		if (e.key === 'Enter' && value !== '') {
-			goto(resolve('/search'));
+			goto('/search?d=' + value);
 		}
 	};
 </script>

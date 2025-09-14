@@ -1,0 +1,19 @@
+meta {
+  name: Search Files
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base}}/api/files/search?q=Portfolio
+  body: none
+  auth: inherit
+}
+
+params:query {
+  q: Portfolio
+}
+
+settings {
+  encodeUrl: true
+}
